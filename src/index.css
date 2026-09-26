@@ -1,0 +1,151 @@
+/* PlacementOS Cyber-HUD Design Tokens */
+
+:root {
+  --neon-yellow: #fee500;
+  --neon-cyan: #00f0ff;
+  --neon-pink: #ff0055;
+  --neon-green: #00ff66;
+  --dark-bg: #030509;
+  --cyber-card: #090d16;
+  
+  --font-heading: 'Orbitron', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--dark-bg);
+  color: #e2e8f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 40%);
+  background-size: 30px 30px, 30px 30px, 100% 100%, 100% 100%;
+  background-attachment: fixed;
+}
+
+.font-orbitron { font-family: var(--font-heading); }
+.font-mono-code, .font-mono-cyber { font-family: var(--font-mono); }
+
+/* Cut-Corner Polygon HUD Cards */
+.hud-card, .glass-panel, .cyber-card {
+  background: rgba(9, 13, 22, 0.88);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05);
+  position: relative;
+}
+
+.hud-card-pink {
+  border: 1px solid rgba(255, 0, 85, 0.5);
+  box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
+}
+
+.hud-card-yellow {
+  border: 1px solid rgba(254, 229, 0, 0.4);
+  box-shadow: 0 0 25px rgba(254, 229, 0, 0.2);
+}
+
+/* Neon HUD Buttons */
+.btn-primary, .btn-cyber-yellow, .btn-neon-yellow {
+  background: var(--neon-yellow);
+  color: #000;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  padding: 10px 20px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: 0 0 20px rgba(254, 229, 0, 0.5);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover, .btn-cyber-yellow:hover, .btn-neon-yellow:hover {
+  background: #fff;
+  box-shadow: 0 0 35px rgba(254, 229, 0, 0.9);
+  transform: scale(1.02);
+}
+
+.btn-cyber-pink, .btn-neon-pink {
+  background: var(--neon-pink);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  padding: 10px 20px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-cyber-pink:hover, .btn-neon-pink:hover {
+  box-shadow: 0 0 35px rgba(255, 0, 85, 1);
+  transform: scale(1.02);
+}
+
+.btn-neon-cyan {
+  background: var(--neon-cyan);
+  color: #000;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: none;
+  padding: 10px 20px;
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-neon-cyan:hover {
+  background: #fff;
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.9);
+  transform: scale(1.02);
+}
+
+/* Animations */
+@keyframes cyberPulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.8); }
+  70% { box-shadow: 0 0 0 25px rgba(255, 0, 85, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+}
+
+.rescue-pulse {
+  animation: cyberPulse 1.8s infinite;
+}
+
+@keyframes breatheOrb {
+  0%, 100% { transform: scale(1); opacity: 0.6; box-shadow: 0 0 15px var(--neon-cyan); }
+  50% { transform: scale(1.35); opacity: 1; box-shadow: 0 0 35px var(--neon-cyan); }
+}
+
+.breathing-neon-orb {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  margin: 0 auto;
+  animation: breatheOrb 4s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #030509; }
+::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 2px; }

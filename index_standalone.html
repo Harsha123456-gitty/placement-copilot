@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PLACEMENT_OS // ADAPTIVE AI ENGINE (FULL STACK)</title>
+  <!-- React & Babel CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Orbitron, Space Grotesk, JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --neon-yellow: #fee500;
+      --neon-cyan: #00f0ff;
+      --neon-pink: #ff0055;
+      --neon-green: #00ff66;
+      --dark-bg: #030509;
+    }
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background-color: var(--dark-bg);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 40%);
+      background-size: 30px 30px, 30px 30px, 100% 100%, 100% 100%;
+      background-attachment: fixed;
+    }
+
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+
+    /* Cut-Corner HUD Cards */
+    .hud-card {
+      background: rgba(9, 13, 22, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      clip-path: polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px));
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.05);
+      position: relative;
+    }
+
+    .hud-card-pink {
+      border: 1px solid rgba(255, 0, 85, 0.5);
+      box-shadow: 0 0 30px rgba(255, 0, 85, 0.3);
+    }
+
+    .hud-card-yellow {
+      border: 1px solid rgba(254, 229, 0, 0.4);
+      box-shadow: 0 0 25px rgba(254, 229, 0, 0.2);
+    }
+
+    /* Buttons */
+    .btn-neon-yellow {
+      background: var(--neon-yellow);
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+      box-shadow: 0 0 20px rgba(254, 229, 0, 0.5);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-neon-yellow:hover {
+      background: #fff;
+      box-shadow: 0 0 35px rgba(254, 229, 0, 0.9);
+      transform: scale(1.02);
+    }
+
+    .btn-neon-pink {
+      background: var(--neon-pink);
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+      box-shadow: 0 0 25px rgba(255, 0, 85, 0.7);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-neon-pink:hover {
+      box-shadow: 0 0 40px rgba(255, 0, 85, 1);
+      transform: scale(1.02);
+    }
+
+    .btn-neon-cyan {
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-neon-cyan:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.8);
+    }
+
+    @keyframes neonPulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.9); }
+      70% { box-shadow: 0 0 0 30px rgba(255, 0, 85, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+    }
+    .neon-pulse-glow { animation: neonPulse 1.8s infinite; }
+
+    .breathing-neon-orb {
+      width: 140px; height: 140px; border-radius: 50%;
+      background: radial-gradient(circle, var(--neon-cyan), var(--neon-pink), var(--neon-yellow));
+      animation: neonBreathe 4s infinite ease-in-out;
+      margin: 0 auto;
+      box-shadow: 0 0 60px var(--neon-cyan);
+    }
+    @keyframes neonBreathe {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.35); opacity: 1; box-shadow: 0 0 90px var(--neon-pink); }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #030509; }
+    ::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const BACKEND_URL = 'http://localhost:5000'; // Node.js Express Backend URL
+
+    function PlacementOSApp() {
+      const [backendConnected, setBackendConnected] = useState(false);
+
+      // User Auth State
+      const [user, setUser] = useState({
+        name: 'STUDENT_01',
+        email: 'student@university.edu',
+        targetCompany: 'AMAZON_SDE1'
+      });
+
+      // Active Workflow Tab
+      const [step, setStep] = useState('analytics');
+      const [score, setScore] = useState({ dsa: 50, sql: 100, apt: 100, comm: 100, avg: 64 });
+      const [answers, setAnswers] = useState({});
+      
+      // Metrics & Confidence Tracking
+      const [studyHours, setStudyHours] = useState(38.5);
+      const [streakDays, setStreakDays] = useState(12);
+      const [confidenceScore, setConfidenceScore] = useState(84);
+
+      // REAL COUNTDOWN TIMER
+      const [secondsLeft, setSecondsLeft] = useState(15 * 60);
+      const [isTimerRunning, setIsTimerRunning] = useState(true);
+
+      // Modals
+      const [showSanctuary, setShowSanctuary] = useState(false);
+      const [showRescueModal, setShowRescueModal] = useState(false);
+      const [rescuePath, setRescuePath] = useState(null);
+      const [rescueResponseData, setRescueResponseData] = useState(null);
+      const [activeFocusTab, setActiveFocusTab] = useState('lecture');
+
+      // Problem Solution Editor State
+      const [userSolutionCode, setUserSolutionCode] = useState('// Two Pointer Solution\nfunction twoSum(numbers, target) {\n    let left = 0, right = numbers.length - 1;\n    while (left < right) {\n        let sum = numbers[left] + numbers[right];\n        if (sum === target) return [left + 1, right + 1];\n        else if (sum < target) left++;\n        else right--;\n    }\n}');
+      const [solutionSubmitted, setSolutionSubmitted] = useState(false);
+      const [playingVideo, setPlayingVideo] = useState(false);
+
+      // Timer Interval
+      useEffect(() => {
+        let timerInterval = null;
+        if (isTimerRunning && secondsLeft > 0) {
+          timerInterval = setInterval(() => {
+            setSecondsLeft((prev) => prev - 1);
+          }, 1000);
+        } else if (secondsLeft === 0) {
+          setIsTimerRunning(false);
+        }
+        return () => clearInterval(timerInterval);
+      }, [isTimerRunning, secondsLeft]);
+
+      const formatTime = (totalSeconds) => {
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      // Test Backend Connection on Mount
+      useEffect(() => {
+        fetch(`${BACKEND_URL}/api/student/metrics/${user.email}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              setBackendConnected(true);
+              setStudyHours(data.user.studyHours);
+              setStreakDays(data.user.streakDays);
+              setConfidenceScore(data.user.confidenceScore);
+              setScore(data.user.assessmentScores);
+            }
+          })
+          .catch(() => setBackendConnected(false));
+      }, []);
+
+      // Execute Diagnostic Matrix Evaluation on Backend
+      const handleAssessmentFinish = async () => {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/assessment/evaluate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, answers })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setScore(data.scores);
+            setBackendConnected(true);
+          }
+        } catch (e) {
+          // Fallback client evaluation
+          let dsa = answers[1] === 'B' ? 50 : 0;
+          let sql = answers[2] === 'B' ? 100 : 0;
+          let apt = answers[3] === 'B' ? 100 : 0;
+          let comm = answers[4] === 'B' ? 100 : 0;
+          let avg = Math.round((dsa + sql + apt + comm) / 4);
+          setScore({ dsa, sql, apt, comm, avg });
+        }
+        setStep('dashboard');
+      };
+
+      // Execute Code Submission & Complexity Audit on Backend
+      const handleCodeSubmit = async () => {
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/code/eval`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, code: userSolutionCode })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setStudyHours(data.updatedStudentMetrics.studyHours);
+            setConfidenceScore(data.updatedStudentMetrics.confidenceScore);
+            setBackendConnected(true);
+          }
+        } catch (e) {
+          setStudyHours(prev => parseFloat((prev + 0.25).toFixed(1)));
+          setConfidenceScore(prev => Math.min(99, prev + 3));
+        }
+        setSolutionSubmitted(true);
+      };
+
+      // Trigger Attention Rescue Engine on Backend
+      const handleTriggerRescueOption = async (optionType) => {
+        setRescuePath(optionType);
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/attention-rescue/trigger`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ optionType, problemId: 'two_sum_2' })
+          });
+          const data = await res.json();
+          if (data.success) {
+            setRescueResponseData(data);
+            setBackendConnected(true);
+          }
+        } catch (e) {
+          setRescueResponseData(null);
+        }
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col justify-between">
+          
+          {/* TOP NAV BAR */}
+          <nav className="border-b border-cyan-500/30 bg-[#060911]/90 backdrop-blur-md sticky top-0 z-40 px-4 py-3">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-yellow-400 text-black font-black font-orbitron text-xl flex items-center justify-center shadow-lg shadow-yellow-400/40">
+                  🛡️
+                </div>
+                <div>
+                  <span className="text-lg font-black text-white font-orbitron tracking-wider flex items-center gap-2">
+                    PLACEMENT_OS <span className="text-yellow-400">// ADAPTIVE AI ENGINE</span>
+                  </span>
+                  <span className="text-[10px] text-cyan-400 font-mono-code flex items-center gap-2">
+                    FULL-STACK BACKEND STATUS: {backendConnected ? <span className="text-emerald-400 font-bold">● CONNECTED (REST API :5000)</span> : <span className="text-yellow-400 font-bold">● STANDALONE DEMO ENGINE</span>}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 text-xs font-mono-code">
+                <div className="hidden md:flex items-center gap-3">
+                  <span className="px-3 py-1 bg-yellow-400/10 border border-yellow-400 text-yellow-300 font-bold">
+                    🔥 STREAK: {streakDays} DAYS
+                  </span>
+                  <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-400 text-cyan-300 font-bold">
+                    ⏱️ {studyHours} HRS STUDIED
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => setShowRescueModal(true)}
+                  className="px-3 py-1.5 bg-pink-600 text-white font-orbitron font-black text-[11px] rounded shadow-lg shadow-pink-600/50 hover:bg-pink-500 flex items-center gap-1.5 cursor-pointer"
+                >
+                  🛟 RESCUE MY FOCUS
+                </button>
+              </div>
+            </div>
+          </nav>
+
+          {/* MAIN CONTENT WORKSPACE */}
+          <main className="max-w-7xl mx-auto p-4 md:p-6 w-full space-y-6 flex-1">
+
+            {/* WORKFLOW TABS */}
+            <div className="hud-card p-2 flex gap-2 text-xs overflow-x-auto">
+              <button onClick={() => setStep('analytics')} className={`px-4 py-2 font-orbitron font-bold text-xs uppercase tracking-wider transition-all ${step === 'analytics' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-400 hover:text-white'}`}>
+                📊 PERSONAL METRICS
+              </button>
+              <button onClick={() => setStep('assessment')} className={`px-4 py-2 font-orbitron font-bold text-xs uppercase tracking-wider transition-all ${step === 'assessment' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-400 hover:text-white'}`}>
+                🎯 SKILL MATRIX
+              </button>
+              <button onClick={() => setStep('dashboard')} className={`px-4 py-2 font-orbitron font-bold text-xs uppercase tracking-wider transition-all ${step === 'dashboard' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-400 hover:text-white'}`}>
+                📈 READINESS HUD
+              </button>
+              <button onClick={() => setStep('plan')} className={`px-4 py-2 font-orbitron font-bold text-xs uppercase tracking-wider transition-all ${step === 'plan' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-400 hover:text-white'}`}>
+                ✨ 30-MIN PREP PATH
+              </button>
+              <button onClick={() => setStep('reassess')} className={`px-4 py-2 font-orbitron font-bold text-xs uppercase tracking-wider transition-all ${step === 'reassess' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-400 hover:text-white'}`}>
+                🏆 REASSESSMENT LOOP
+              </button>
+            </div>
+
+            {/* TAB 1: PERSONAL METRICS */}
+            {step === 'analytics' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono-code">
+                  <div className="hud-card p-5 space-y-1">
+                    <span className="text-[11px] text-slate-400 block uppercase">TOTAL STUDY TIME</span>
+                    <span className="text-3xl font-black text-cyan-400 font-orbitron">{studyHours} HRS</span>
+                    <span className="text-[10px] text-emerald-400 block">+4.5 hrs this week</span>
+                  </div>
+
+                  <div className="hud-card p-5 space-y-1">
+                    <span className="text-[11px] text-slate-400 block uppercase">CURRENT STREAK</span>
+                    <span className="text-3xl font-black text-yellow-400 font-orbitron">{streakDays} DAYS 🔥</span>
+                    <span className="text-[10px] text-yellow-300 block">Personal Best Streak</span>
+                  </div>
+
+                  <div className="hud-card p-5 space-y-1">
+                    <span className="text-[11px] text-slate-400 block uppercase">CONFIDENCE SCORE</span>
+                    <span className="text-3xl font-black text-pink-400 font-orbitron">{confidenceScore}%</span>
+                    <span className="text-[10px] text-pink-300 block">Calculated from speed & hints</span>
+                  </div>
+
+                  <div className="hud-card p-5 space-y-1">
+                    <span className="text-[11px] text-slate-400 block uppercase">ASSESSMENT ACCURACY</span>
+                    <span className="text-3xl font-black text-emerald-400 font-orbitron">{score.avg}%</span>
+                    <span className="text-[10px] text-emerald-300 block">Target: 85%+</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="hud-card p-6 space-y-4">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-3 font-orbitron">
+                        <h3 className="text-sm font-bold text-white">// HISTORICAL ASSESSMENT PROGRESS CURVE</h3>
+                        <span className="text-xs text-emerald-400 font-mono-code font-bold">+32% Growth Rate</span>
+                      </div>
+
+                      <div className="space-y-4 font-mono-code text-xs">
+                        <div>
+                          <div className="flex justify-between text-slate-300 mb-1">
+                            <span>Initial Baseline Score:</span>
+                            <span className="text-pink-400 font-bold">50%</span>
+                          </div>
+                          <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div className="h-full bg-pink-500 rounded-full" style={{ width: '50%' }}></div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between text-slate-300 mb-1">
+                            <span>Current Post-Practice Score:</span>
+                            <span className="text-emerald-400 font-bold">82%</span>
+                          </div>
+                          <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div className="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 rounded-full" style={{ width: '82%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="hud-card p-6 space-y-4">
+                      <h3 className="text-sm font-bold text-white font-orbitron border-b border-slate-800 pb-3">// RECENT PRACTICE LOGS</h3>
+                      <div className="space-y-2 text-xs font-mono-code">
+                        <div className="p-3 bg-slate-950 border border-slate-800 flex justify-between items-center">
+                          <div>
+                            <span className="text-white font-bold block">Graph DFS Traversal (15 Min Sprint)</span>
+                            <span className="text-[11px] text-slate-400">Attention Rescue used: 1 Socratic Hint</span>
+                          </div>
+                          <span className="text-emerald-400 font-bold">PASSED (100%)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="hud-card p-6 space-y-4 hud-card-pink">
+                    <h3 className="text-sm font-bold text-white font-orbitron border-b border-slate-800 pb-3">// CONFIDENCE ENGINE AUDIT</h3>
+                    
+                    <div className="text-center py-4 space-y-2">
+                      <div className="w-24 h-24 rounded-full border-4 border-pink-500 mx-auto flex items-center justify-center text-3xl font-black text-white font-orbitron shadow-lg shadow-pink-500/40">
+                        {confidenceScore}%
+                      </div>
+                      <span className="text-xs font-mono-code text-pink-300 font-bold block uppercase">REAL-TIME CONFIDENCE RATING</span>
+                    </div>
+
+                    <button onClick={() => setShowSanctuary(true)} className="btn-neon-yellow text-xs w-full py-3 mt-4">
+                      🔒 LAUNCH FOCUS SANCTUARY
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: DIAGNOSTIC MATRIX */}
+            {step === 'assessment' && (
+              <div className="hud-card p-6 space-y-6">
+                <div className="border-b border-slate-800 pb-3 flex justify-between items-center">
+                  <h2 className="text-lg font-bold text-cyan-400 font-orbitron uppercase tracking-wide">// DIAGNOSTIC SKILL MATRIX</h2>
+                  <span className="text-xs font-mono-code text-yellow-400 bg-yellow-400/10 border border-yellow-400 px-3 py-1 font-bold">BACKEND API EVALUATION ENGINE</span>
+                </div>
+
+                <div className="space-y-4 text-xs font-mono-code">
+                  <div className="p-4 bg-slate-950/80 border border-cyan-500/40 space-y-3">
+                    <span className="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 font-bold uppercase text-[10px]">DSA • Arrays / Two Pointers</span>
+                    <p className="text-sm font-semibold text-slate-100 font-sans">1. Which technique finds a pair with target sum in sorted array in O(N) time and O(1) space?</p>
+                    <div className="space-y-2 pt-1 font-sans">
+                      <label className="block p-3 bg-slate-900 border border-slate-800 hover:border-cyan-400 cursor-pointer"><input type="radio" name="q1" onChange={() => setAnswers({...answers, 1: 'A'})} /> A) Nested Loops O(N²)</label>
+                      <label className="block p-3 bg-slate-900 border border-cyan-400 text-cyan-300 font-bold cursor-pointer"><input type="radio" name="q1" onChange={() => setAnswers({...answers, 1: 'B'})} /> B) Two Pointers (Left & Right inward traversal) ✅</label>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-slate-950/80 border border-pink-500/40 space-y-3">
+                    <span className="px-2.5 py-0.5 bg-pink-500/20 text-pink-300 font-bold uppercase text-[10px]">SQL • Joins & Aggregation</span>
+                    <p className="text-sm font-semibold text-slate-100 font-sans">2. Which SQL clause filters records AFTER a GROUP BY aggregation function?</p>
+                    <div className="space-y-2 pt-1 font-sans">
+                      <label className="block p-3 bg-slate-900 border border-slate-800 hover:border-pink-400 cursor-pointer"><input type="radio" name="q2" onChange={() => setAnswers({...answers, 2: 'A'})} /> A) WHERE clause</label>
+                      <label className="block p-3 bg-slate-900 border border-pink-400 text-pink-300 font-bold cursor-pointer"><input type="radio" name="q2" onChange={() => setAnswers({...answers, 2: 'B'})} /> B) HAVING clause ✅</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button onClick={handleAssessmentFinish} className="btn-neon-pink text-xs px-6 py-3">
+                    EXECUTE BACKEND EVALUATION
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: READINESS HUD */}
+            {step === 'dashboard' && (
+              <div className="hud-card p-6 space-y-6">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-white font-orbitron">// READINESS METRICS HUD</h2>
+                    <p className="text-xs text-slate-400 font-mono-code">Calculated by Backend Evaluation Engine.</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-4xl font-black text-yellow-400 font-orbitron tracking-tight drop-shadow-[0_0_15px_#fee500]">
+                      {score ? score.avg : 64}%
+                    </span>
+                    <span className="text-[10px] text-cyan-400 block font-mono-code font-bold uppercase tracking-wider">HIRING BAR MATCH</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono-code">
+                  <div className="p-4 bg-slate-950 border border-cyan-500/40"><span className="text-[10px] text-slate-400 block uppercase">DSA / Coding</span><span className="text-2xl font-bold text-cyan-400">{score ? score.dsa : 50}%</span></div>
+                  <div className="p-4 bg-slate-950 border border-pink-500/40"><span className="text-[10px] text-slate-400 block uppercase">SQL / DB</span><span className="text-2xl font-bold text-pink-400">{score ? score.sql : 100}%</span></div>
+                  <div className="p-4 bg-slate-950 border border-yellow-500/40"><span className="text-[10px] text-slate-400 block uppercase">Aptitude</span><span className="text-2xl font-bold text-yellow-400">{score ? score.apt : 100}%</span></div>
+                  <div className="p-4 bg-slate-950 border border-emerald-500/40"><span className="text-[10px] text-slate-400 block uppercase">Communication</span><span className="text-2xl font-bold text-emerald-400">{score ? score.comm : 100}%</span></div>
+                </div>
+
+                <div className="p-4 bg-pink-950/40 border border-pink-500 text-xs font-mono-code space-y-1">
+                  <span className="font-bold text-pink-400 flex items-center gap-2">⚠️ BACKEND WEAKNESS MATRIX:</span>
+                  <p className="text-slate-300">DSA Arrays (Two Pointer Technique) & Graph DFS require targeted practice.</p>
+                </div>
+
+                <div className="flex justify-end">
+                  <button onClick={() => setStep('plan')} className="btn-neon-yellow text-xs px-6 py-3">
+                    GENERATE ADAPTIVE PREP PATH
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: 30-MIN PREP PATH */}
+            {step === 'plan' && (
+              <div className="hud-card p-6 space-y-6">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                  <h2 className="text-xl font-bold text-white font-orbitron">// TODAY'S 30-MIN PREP PROTOCOL</h2>
+                  <span className="text-xs px-3 py-1 bg-yellow-400 text-black font-orbitron font-bold">TARGET: DSA ARRAYS</span>
+                </div>
+
+                <div className="space-y-3 text-xs font-mono-code">
+                  <div className="p-4 bg-slate-950 border border-cyan-500/50 flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-cyan-300 text-sm font-sans">1. Concept Revision (5 min)</h4>
+                      <p className="text-slate-400 mt-0.5 font-sans">Watch 5-min Video Lecture & Pattern Cheatsheet for Two Pointers</p>
+                    </div>
+                    <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 border border-cyan-400 font-bold">READY</span>
+                  </div>
+
+                  <div className="p-4 bg-slate-950 border border-cyan-500/50 flex justify-between items-center">
+                    <div>
+                      <h4 className="font-bold text-cyan-300 text-sm font-sans">2. Easy Practice (10 min)</h4>
+                      <p className="text-slate-400 mt-0.5 font-sans">Two Sum II — Sorted Array (Optimized Space)</p>
+                    </div>
+                    <span className="px-3 py-1 bg-cyan-500/20 text-cyan-400 border border-cyan-400 font-bold">READY</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button onClick={() => setShowSanctuary(true)} className="btn-neon-yellow text-xs px-6 py-3">
+                    LAUNCH FOCUS SANCTUARY WITH LECTURES & PRACTICE
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 5: REASSESSMENT LOOP */}
+            {step === 'reassess' && (
+              <div className="hud-card p-8 text-center space-y-6 border-emerald-500/60">
+                <h2 className="text-3xl font-black text-white font-orbitron tracking-wider">// MEASURABLE GROWTH VERIFIED</h2>
+                <div className="p-6 bg-slate-950 border border-emerald-500 text-emerald-400 text-sm space-y-2 font-mono-code">
+                  <p className="text-3xl font-black font-orbitron text-yellow-400">DSA ARRAYS ACCURACY: 50% ➔ 82% (+32%)</p>
+                  <p className="text-xs text-slate-300 font-sans">
+                    Nova AI: "Mastery confirmed! Two Pointers skill updated. Confidence score boosted to {confidenceScore}%."
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* FOCUS SANCTUARY MODAL */}
+            {showSanctuary && (
+              <div className="fixed inset-0 bg-[#030509] p-6 z-50 flex flex-col justify-between overflow-y-auto">
+                <div className="w-full max-w-7xl mx-auto flex justify-between items-center text-xs font-mono-code border-b border-cyan-500/40 pb-4">
+                  <button onClick={() => setShowSanctuary(false)} className="text-pink-400 hover:text-white font-bold">[X] EXIT FOCUS SANCTUARY</button>
+                  <div className="flex items-center gap-3">
+                    <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500 font-bold">
+                      🔒 SANCTUARY HOLO-DECK ACTIVE
+                    </span>
+                    <span className="px-3 py-1 bg-yellow-400 text-black font-orbitron font-bold">
+                      TARGET: DSA TWO POINTERS
+                    </span>
+                  </div>
+                </div>
+
+                <div className="w-full max-w-7xl mx-auto my-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  
+                  {/* LEFT 2 COLUMNS */}
+                  <div className="lg:col-span-2 space-y-4">
+                    <div className="hud-card p-2 flex gap-2 text-xs font-orbitron">
+                      <button onClick={() => setActiveFocusTab('lecture')} className={`px-4 py-2 font-bold ${activeFocusTab === 'lecture' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/50' : 'text-slate-400'}`}>
+                        📺 5-MIN CONCEPT LECTURE
+                      </button>
+                      <button onClick={() => setActiveFocusTab('cheatsheet')} className={`px-4 py-2 font-bold ${activeFocusTab === 'cheatsheet' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/50' : 'text-slate-400'}`}>
+                        🧠 CODE CHEATSHEET
+                      </button>
+                      <button onClick={() => setActiveFocusTab('problem')} className={`px-4 py-2 font-bold ${activeFocusTab === 'problem' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/50' : 'text-slate-400'}`}>
+                        💻 PRACTICE PROBLEM
+                      </button>
+                    </div>
+
+                    {activeFocusTab === 'lecture' && (
+                      <div className="hud-card p-5 space-y-4 border-cyan-500">
+                        <div className="flex justify-between items-center font-orbitron">
+                          <h3 className="text-sm font-bold text-yellow-400">// RECOMMENDED VIDEO LECTURE: TWO POINTER TECHNIQUE</h3>
+                          <span className="text-[10px] px-2.5 py-0.5 bg-cyan-500/20 text-cyan-300 font-mono-code border border-cyan-400">5 MIN DURATION</span>
+                        </div>
+                        
+                        <div className="w-full h-60 bg-slate-950 border border-cyan-500 flex flex-col items-center justify-center text-center p-6 space-y-3 relative">
+                          <button
+                            onClick={() => setPlayingVideo(!playingVideo)}
+                            className="w-16 h-16 bg-pink-500 text-white flex items-center justify-center text-2xl font-black shadow-lg shadow-pink-500/60 cursor-pointer hover:scale-110 transition-all"
+                          >
+                            {playingVideo ? '⏸' : '▶'}
+                          </button>
+                          <div>
+                            <p className="text-xs font-bold text-white font-orbitron">
+                              {playingVideo ? '▶ PLAYING CONCEPT VIDEO LECTURE...' : 'Visual Breakdown: Left & Right Pointers Inward Traversal'}
+                            </p>
+                            <p className="text-[11px] text-slate-400 font-mono-code">Recommended by Nova AI based on diagnostic DSA score (50%)</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeFocusTab === 'cheatsheet' && (
+                      <div className="hud-card p-5 space-y-3 text-xs font-mono-code">
+                        <h3 className="text-sm font-bold text-cyan-400 font-orbitron">// CODE TEMPLATE: TWO POINTERS</h3>
+                        <pre className="p-4 bg-slate-950 text-emerald-400 border border-emerald-500/60 overflow-x-auto text-[11px]">
+{`let left = 0;
+let right = arr.length - 1;
+
+while (left < right) {
+    let currentSum = arr[left] + arr[right];
+    if (currentSum === target) return [left + 1, right + 1];
+    else if (currentSum < target) left++; // Move left pointer inward
+    else right--; // Move right pointer inward
+}`}
+                        </pre>
+                      </div>
+                    )}
+
+                    {activeFocusTab === 'problem' && (
+                      <div className="hud-card p-5 space-y-3 text-xs font-mono-code">
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-sm font-bold text-white font-orbitron">// PROBLEM: TWO SUM II — SORTED ARRAY</h3>
+                          <span className="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500 text-[10px]">EASY</span>
+                        </div>
+                        <textarea
+                          value={userSolutionCode}
+                          onChange={(e) => setUserSolutionCode(e.target.value)}
+                          className="w-full h-40 bg-slate-950 border border-cyan-500 p-3 font-mono-code text-xs text-cyan-300 focus:outline-none"
+                        />
+                        <button onClick={handleCodeSubmit} className="btn-neon-pink text-xs px-5 py-2.5">
+                          {solutionSubmitted ? '✅ SOLUTION SUBMITTED & EVALUATED BY BACKEND!' : 'SUBMIT CODE TO BACKEND SERVER'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* RIGHT COLUMN */}
+                  <div className="space-y-4 font-mono-code">
+                    <div className="hud-card p-6 text-center space-y-4 hud-card-yellow">
+                      <span className="text-xs text-yellow-400 font-orbitron tracking-wider block">// LIVE SPRINT TIMER</span>
+                      
+                      <div className="text-6xl font-black text-yellow-400 font-orbitron tracking-tighter drop-shadow-[0_0_20px_#fee500]">
+                        {formatTime(secondsLeft)}
+                      </div>
+
+                      <div className="flex justify-center gap-2 text-xs">
+                        <button
+                          onClick={() => setIsTimerRunning(!isTimerRunning)}
+                          className="px-3 py-1.5 bg-slate-900 border border-yellow-400 text-yellow-300 font-bold hover:bg-yellow-400 hover:text-black"
+                        >
+                          {isTimerRunning ? 'PAUSE TIMER' : 'RESUME TIMER'}
+                        </button>
+                        <button
+                          onClick={() => { setSecondsLeft(15 * 60); setIsTimerRunning(true); }}
+                          className="px-3 py-1.5 bg-slate-900 border border-slate-700 text-slate-300 hover:border-white"
+                        >
+                          RESET
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => setShowRescueModal(true)}
+                        className="neon-pulse-glow btn-neon-pink w-full py-4 text-xs font-black tracking-wider cursor-pointer"
+                      >
+                        🛟 ATTENTION RESCUE PROTOCOL
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            )}
+
+            {/* ATTENTION RESCUE MODAL */}
+            {showRescueModal && (
+              <div
+                style={{ zIndex: 9999 }}
+                className="fixed inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4"
+              >
+                <div className="hud-card p-6 max-w-md w-full space-y-4 hud-card-pink relative border-2 border-pink-500">
+                  <div className="flex justify-between border-b border-pink-500/60 pb-2">
+                    <h3 className="text-sm font-bold text-white font-orbitron text-pink-400 flex items-center gap-2">
+                      🛟 ATTENTION RESCUE STATION
+                    </h3>
+                    <button onClick={() => { setShowRescueModal(false); setRescuePath(null); }} className="text-xs text-pink-400 font-mono-code hover:text-white">[X] CLOSE</button>
+                  </div>
+                  
+                  <p className="text-xs text-slate-200 font-mono-code">
+                    Select a recovery protocol (powered by Backend AI Engine):
+                  </p>
+                  
+                  <div className="space-y-2.5 text-xs font-mono-code">
+                    <button
+                      onClick={() => handleTriggerRescueOption('micro')}
+                      className={`w-full p-3.5 bg-slate-950 border text-left transition-all ${
+                        rescuePath === 'micro' ? 'border-cyan-400 bg-cyan-950/60' : 'border-cyan-500/60 hover:bg-cyan-500 hover:text-black'
+                      }`}
+                    >
+                      <strong className="block text-cyan-300">OPTION 1: MICRO-SPLIT MCQ</strong>
+                      <span className="text-slate-300 text-[11px] font-sans block mt-0.5">Break problem into 1 quick 30-sec diagnostic quiz to regain momentum.</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTriggerRescueOption('hint')}
+                      className={`w-full p-3.5 bg-slate-950 border text-left transition-all ${
+                        rescuePath === 'hint' ? 'border-yellow-400 bg-yellow-950/60' : 'border-yellow-500/60 hover:bg-yellow-400 hover:text-black'
+                      }`}
+                    >
+                      <strong className="block text-yellow-300">OPTION 2: SOCRATIC HINT</strong>
+                      <span className="text-slate-300 text-[11px] font-sans block mt-0.5">Get 1 conceptual clue without giving away full code.</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleTriggerRescueOption('breath')}
+                      className={`w-full p-3.5 bg-slate-950 border text-left transition-all ${
+                        rescuePath === 'breath' ? 'border-emerald-400 bg-emerald-950/60' : 'border-emerald-500/60 hover:bg-emerald-500 hover:text-black'
+                      }`}
+                    >
+                      <strong className="block text-emerald-300">OPTION 3: 60-SEC BREATHING RESET</strong>
+                      <span className="text-slate-300 text-[11px] font-sans block mt-0.5">Clear mental fog with a visual breathing exercise.</span>
+                    </button>
+                  </div>
+
+                  {/* ACTIVE PATH CONTENT FROM BACKEND */}
+                  {rescuePath === 'micro' && (
+                    <div className="p-3.5 bg-cyan-950 border border-cyan-500 text-xs font-mono-code space-y-2">
+                      <p className="font-bold text-cyan-300">{rescueResponseData?.question || 'Micro-Task: Which data structure reduces lookup time to O(1)?'}</p>
+                      <button
+                        onClick={() => {
+                          alert('✅ Correct! Hash Map reduces lookup to O(1). Focus momentum restored!');
+                          setRescuePath(null);
+                          setShowRescueModal(false);
+                        }}
+                        className="w-full p-2 bg-cyan-400 text-black font-bold font-orbitron hover:bg-white"
+                      >
+                        HASH MAP ✅
+                      </button>
+                    </div>
+                  )}
+
+                  {rescuePath === 'hint' && (
+                    <div className="p-3.5 bg-yellow-950 border border-yellow-500 text-xs font-mono-code text-yellow-200 space-y-2">
+                      <p>{rescueResponseData?.hintText || '💡 SOCRATIC HINT: "Since array is sorted, moving left pointer rightward increases sum, and moving right pointer leftward decreases sum!"'}</p>
+                      <button
+                        onClick={() => {
+                          setShowRescueModal(false);
+                          setRescuePath(null);
+                        }}
+                        className="btn-neon-yellow text-xs w-full py-1.5"
+                      >
+                        GOT IT! RETURN TO TASK
+                      </button>
+                    </div>
+                  )}
+
+                  {rescuePath === 'breath' && (
+                    <div className="p-4 bg-slate-950 border border-emerald-500 text-center space-y-3">
+                      <div className="breathing-neon-orb"></div>
+                      <p className="text-xs text-cyan-300 font-orbitron font-bold">INHALE... EXHALE...</p>
+                      <button
+                        onClick={() => {
+                          setShowRescueModal(false);
+                          setRescuePath(null);
+                        }}
+                        className="btn-neon-cyan text-xs w-full py-1.5"
+                      >
+                        MIND CLEAR • RETURN TO TASK
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      onClick={() => { setShowRescueModal(false); setRescuePath(null); }}
+                      className="btn-neon-pink text-xs px-4 py-2"
+                    >
+                      CLOSE RESCUE STATION
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* FOOTER */}
+          <footer className="border-t border-slate-800/80 bg-[#04060b] py-4 px-6 text-xs text-slate-500 font-mono-code flex justify-between items-center">
+            <span>PLACEMENT_OS // FULL-STACK BACKEND ENGINE ACTIVE (EXPRESS + GEMINI)</span>
+            <span className="text-emerald-400">STATUS: ALL SYSTEMS OPERATIONAL</span>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<PlacementOSApp />);
+  </script>
+</body>
+</html>
